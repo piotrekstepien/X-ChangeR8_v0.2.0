@@ -60,6 +60,7 @@ layout = [
      sg.CalendarButton(button_text=today, target="-CALENDAR_INPUT_TO-", key="-DATETO-", format=("%Y-%m-%d"),
                        enable_events=True),
      sg.Button("SUBMIT")],
+    [sg.Text("Today rates: "), sg.Text(key = "-TODAYRATE-", enable_events=True)],
     [sg.Canvas(key="-CANVAS-")]
 ]
 window = sg.Window("X-changeR8 V0.0.1", layout, finalize=True)
@@ -88,6 +89,11 @@ while True:
         url2 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency2}/{date_from}/{date_to}"
         first_currency = get_currency_as_list(url1)
         second_currency = get_currency_as_list(url2)
+
+        # today rate:
+        today_exchange_rate = round(first_currency[-1]/second_currency[-1], 4)
+        window["-TODAYRATE-"].update(today_exchange_rate)
+
         currency = get_currency_ratio(first_currency, second_currency)
         fig = plt.figure(figsize=(6, 4))
         fig.add_subplot(111).plot(get_date_list(url1), currency)
