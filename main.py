@@ -33,6 +33,22 @@ def get_currency_as_list(
     return currency_list
 
 
+def pln_chosen(currency_1, currency_2, date_1, date_2):
+    if currency_1 == "PLN":
+       url1 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency_2}/{date_1}/{date_2}"
+    if currency_2 == "PLN":
+       url1 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency_1}/{date_1}/{date_2}"
+    return url1
+
+
+def only_ones(url):
+    currency_list = get_currency_as_list(url)
+    lista = []
+    for i in range(0, len(currency_list)):
+        lista.append(1)
+    return lista
+
+
 def get_currency_ratio(currency_1, currency_2):  # returns ratio of any currencies as a list in specific time period
     ratio = []
     for i in range(0, len(currency_1)):
@@ -47,7 +63,7 @@ today = date.today()
 
 # currency = get_currency_as_list(url)
 
-list_of_currencies = ["USD", "EUR", "BGN", "PLN"]
+list_of_currencies = ["USD", "EUR", "BGN", "PLN", "NOK"]
 #
 # Builds GUI:
 layout = [
@@ -60,7 +76,7 @@ layout = [
      sg.CalendarButton(button_text=today, target="-CALENDAR_INPUT_TO-", key="-DATETO-", format=("%Y-%m-%d"),
                        enable_events=True),
      sg.Button("SUBMIT")],
-    [sg.Text("Today rates: "), sg.Text(key = "-TODAYRATE-", enable_events=True)],
+    [sg.Text("Today rates: "), sg.Text(key="-TODAYRATE-", enable_events=True)],
     [sg.Canvas(key="-CANVAS-")]
 ]
 window = sg.Window("X-changeR8 V0.0.1", layout, finalize=True)
@@ -78,20 +94,24 @@ while True:
         if date_to == "":
             date_to = today
         window["-DATETO-"].update(text=date_to)
-        #if values["-CURRENCY1-"]=="PLN":
-        ##################################################
-        #KILL THE BUG!
-        ##################################################
 
         currency1 = values["-CURRENCY1-"]
         currency2 = values["-CURRENCY2-"]
-        url1 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency1}/{date_from}/{date_to}"
-        url2 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency2}/{date_from}/{date_to}"
-        first_currency = get_currency_as_list(url1)
-        second_currency = get_currency_as_list(url2)
-
+        if currency1 != "PLN" and currency2 != "PLN":
+            url1 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency1}/{date_from}/{date_to}"
+            url2 = "http://api.nbp.pl/api/exchangerates/rates/A/" + f"{currency2}/{date_from}/{date_to}"
+            first_currency = get_currency_as_list(url1)
+            second_currency = get_currency_as_list(url2)
+        else:
+            url1 = pln_chosen(currency1, currency2, date_from, date_to)
+            if currency1 == "PLN":
+                first_currency = only_ones(url1)
+                second_currency = get_currency_as_list(url1)
+            else:
+                first_currency = get_currency_as_list(url1)
+                second_currency = only_ones(url1)
         # today rate:
-        today_exchange_rate = round(first_currency[-1]/second_currency[-1], 4)
+        today_exchange_rate = round(first_currency[-1] / second_currency[-1], 4)
         window["-TODAYRATE-"].update(today_exchange_rate)
 
         currency = get_currency_ratio(first_currency, second_currency)
