@@ -50,3 +50,4 @@ def get_currency_ratio(currency_1, currency_2):  # returns ratio of any currenci
     for i in range(0, len(currency_1)):
         ratio.append(round(currency_1[i] / currency_2[i], 4))
     return ratio
+
