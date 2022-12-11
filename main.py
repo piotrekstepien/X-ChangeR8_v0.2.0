@@ -11,6 +11,8 @@ def get_currency_exchange_rate():
         x = data1
         y = data2
         axes[0].plot(x,y,"r-")
+        axes[0].xaxis.set_major_locator(plt.MaxNLocator(5))
+        axes[0].grid()
         figure_canvas_agg.draw()
         figure_canvas_agg.get_tk_widget().pack()
 
@@ -27,7 +29,7 @@ def get_currency_exchange_rate():
                                enable_events=True),sg.Push(),
              sg.Button("SUBMIT", size = (7,1))],
             [sg.Text("Today's exchange rate: ", font="14"), sg.Text(key="-TODAYRATE-", enable_events=True), sg.Push(),
-             sg.Button("AGAIN", key = "-AGAIN-", enable_events=True, size=(7,1))],
+             sg.Button("RESET", key = "-AGAIN-", enable_events=True, size=(7,1))],
             [sg.Canvas(key="-CANVAS-")]
         ]
         return sg.Window("X-changeR8 V0.0.1", layout, finalize=True)
@@ -78,11 +80,7 @@ def get_currency_exchange_rate():
             window["-TODAYRATE-"].update(today_exchange_rate)
 
             currency = get_currency_ratio(first_currency, second_currency)
-            # fig = plt.figure(figsize=(6, 4))
-            # fig.add_subplot(111).plot(get_date_list(url1), currency)
-            # figure_canvas_agg = FigureCanvasTkAgg(fig, window["-CANVAS-"].TKCanvas)
-            # figure_canvas_agg.draw()
-            # figure_canvas_agg.get_tk_widget().pack()
+
             update_plot(get_date_list(url1), currency)
         if event == "-AGAIN-":
             window.close()
